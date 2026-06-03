@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GIS — Victoria O'Brien — May 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --bg-subtle: #f6f8fa; --bg-card: #ffffff;
+      --border: #d1d9e0; --border-subtle: #e8ecf0;
+      --text: #1a1f26; --text-sec: #4b5563; --text-ter: #6b7280;
+      --green: #16a34a; --green-bg: #f0fdf4; --green-bd: #bbf7d0;
+      --yellow: #b45309; --yellow-bg: #fffbeb; --yellow-bd: #fde68a;
+      --red: #dc2626; --red-bg: #fef2f2; --red-bd: #fecaca;
+      --blue: #1d4ed8; --blue-bg: #eff6ff; --blue-bd: #bfdbfe;
+      --neutral-bg: #f6f8fa; --neutral-bd: #d1d9e0;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+    .page { max-width: 1040px; margin: 0 auto; padding: 40px 32px 60px; }
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
+    h2 { font-size: 16px; font-weight: 650; letter-spacing: -0.2px; color: var(--text); }
+    p { color: var(--text-sec); font-size: 13px; }
+    .stack { display: flex; flex-direction: column; }
+    .row { display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .gap-4 { gap: 4px; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; } .gap-28 { gap: 28px; }
+    .card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg-card); }
+    .card-header { padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--text-sec); border-bottom: 1px solid var(--border-subtle); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .card-body { padding: 14px; }
+    hr { border: none; border-top: 1px solid var(--border-subtle); margin: 4px 0; }
+    .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 100px; border: 1px solid; white-space: nowrap; }
+    .pill-success { color: var(--green); background: var(--green-bg); border-color: var(--green-bd); }
+    .pill-warning { color: var(--yellow); background: var(--yellow-bg); border-color: var(--yellow-bd); }
+    .pill-danger { color: var(--red); background: var(--red-bg); border-color: var(--red-bd); }
+    .pill-info { color: var(--blue); background: var(--blue-bg); border-color: var(--blue-bd); }
+    .pill-neutral { color: var(--text-sec); background: var(--neutral-bg); border-color: var(--neutral-bd); }
+    .stat { text-align: center; }
+    .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .stat-label { font-size: 11px; color: var(--text-ter); margin-top: 2px; }
+    .stat-success { color: var(--green); } .stat-warning { color: var(--yellow); } .stat-danger { color: var(--red); }
+    .v2mom-card { padding: 14px 16px; }
+    .v2mom-meta { font-size: 12px; color: var(--text-ter); margin-top: 6px; }
+    .v2mom-row { display: flex; align-items: flex-start; gap: 16px; margin-top: 10px; }
+    .rank-badge { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-subtle); border: 1px solid var(--border); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-sec); }
+    .callout { border-radius: 8px; padding: 12px 14px; border-left: 3px solid; font-size: 13px; }
+    .callout-title { font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+    .callout-body { color: var(--text-sec); font-size: 13px; }
+    .callout-info { background: var(--blue-bg); border-color: var(--blue); }
+    .callout-info .callout-title { color: var(--blue); }
+    .callout-success { background: var(--green-bg); border-color: var(--green); }
+    .callout-success .callout-title { color: var(--green); }
+    .callout-warning { background: var(--yellow-bg); border-color: var(--yellow); }
+    .callout-warning .callout-title { color: var(--yellow); }
+    .callout-neutral { background: var(--neutral-bg); border-color: var(--border); }
+    .callout-neutral .callout-title { color: var(--text); }
+    .callout-danger { background: var(--red-bg); border-color: var(--red); }
+    .callout-danger .callout-title { color: var(--red); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text-ter); background: var(--bg-subtle); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.4px; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    .td-center { text-align: center; }
+    .footer { border-top: 1px solid var(--border-subtle); padding-top: 12px; font-size: 11px; color: var(--text-ter); }
+    .section { margin-top: 28px; }
+    @media print { .page { padding: 20px; } body { font-size: 13px; } }
+  </style>
+</head>
+<body>
+<script>
+(function() {
+  var pw = "OBrien1";
+  if (sessionStorage.getItem('gis_' + btoa(pw)) === '1') return;
+  document.addEventListener('DOMContentLoaded', function() {
+    var o = document.createElement('div');
+    o.id = 'pw-overlay';
+    o.style.cssText = 'position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;';
+    o.innerHTML = '<div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:40px;width:360px;text-align:center;">'
+      + '<div style="color:#64748b;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">GIS May 2026 &middot; Confidential</div>'
+      + '<div style="color:#f1f5f9;font-size:20px;font-weight:700;margin-bottom:6px;">Protected Document</div>'
+      + '<div style="color:#94a3b8;font-size:13px;margin-bottom:28px;">Enter your access password to view this document.</div>'
+      + '<input id="pw-in" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:11px 14px;background:#0f172a;border:1px solid #334155;border-radius:7px;color:#f1f5f9;font-size:15px;outline:none;box-sizing:border-box;margin-bottom:10px;transition:border .15s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#334155'">'
+      + '<div id="pw-err" style="color:#f87171;font-size:12px;margin-bottom:14px;min-height:16px;"></div>'
+      + '<button id="pw-btn" style="width:100%;padding:11px;background:#3b82f6;border:none;border-radius:7px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Unlock Document</button>'
+      + '</div>';
+    document.body.insertBefore(o, document.body.firstChild);
+    function check() {
+      if (document.getElementById('pw-in').value === pw) {
+        sessionStorage.setItem('gis_' + btoa(pw), '1');
+        document.getElementById('pw-overlay').style.opacity = '0';
+        document.getElementById('pw-overlay').style.transition = 'opacity .3s';
+        setTimeout(function() { document.getElementById('pw-overlay').remove(); }, 300);
+      } else {
+        document.getElementById('pw-err').textContent = 'Incorrect password â€” please try again.';
+        document.getElementById('pw-in').value = '';
+        document.getElementById('pw-in').focus();
+      }
+    }
+    document.getElementById('pw-btn').addEventListener('click', check);
+    document.getElementById('pw-in').addEventListener('keydown', function(e) { if (e.key === 'Enter') check(); });
+    setTimeout(function() { document.getElementById('pw-in').focus(); }, 80);
+  });
+})();
+</script>
+
+<div class="page stack gap-28">
+
+  <div class="stack gap-4">
+    <div class="row gap-8" style="align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
+      <div class="stack gap-4">
+        <h1>GIS Leader Review — Victoria O'Brien</h1>
+        <div class="row gap-12">
+          <p>Global Impact Survey &middot; May 2026 &middot; 7 Direct Reports &middot; RCG SE Organization</p>
+          <span class="pill pill-neutral">Stable Baseline</span>
+        </div>
+      </div>
+      <span class="pill pill-info">Confidential — For Leader Review</span>
+    </div>
+  </div>
+
+  <div class="section stack gap-12">
+    <h2>Your Team's Scorecard</h2>
+    <p>Your scores compared to the RCG SE org average (May 2026). Limited historical comparison data is available for this cycle.</p>
+    <table>
+      <thead><tr><th>Metric</th><th class="td-center">Your Team</th><th class="td-center">Org Average</th><th class="td-center">Status</th></tr></thead>
+      <tbody>
+        <tr><td>Engagement Index</td><td class="td-center"><strong>80%</strong></td><td class="td-center" style="color:var(--text-ter);">82%</td><td class="td-center"><span class="pill pill-neutral">Near Avg</span></td></tr>
+        <tr><td>Stay Rate (would not leave for comparable role)</td><td class="td-center"><strong>71%</strong></td><td class="td-center" style="color:var(--text-ter);">71%</td><td class="td-center"><span class="pill pill-neutral">At Avg</span></td></tr>
+        <tr><td>12-Month Foresee (still here in a year)</td><td class="td-center"><strong>71%</strong></td><td class="td-center" style="color:var(--text-ter);">84%</td><td class="td-center"><span class="pill pill-warning">Below</span></td></tr>
+        <tr><td>Talent Multiplier Index (manager effectiveness)</td><td class="td-center"><strong>88%</strong></td><td class="td-center" style="color:var(--text-ter);">95%</td><td class="td-center"><span class="pill pill-warning">Below Avg</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-info" style="margin-top: 4px;">
+      <div class="callout-title">Solid Baseline — Opportunity to Build Momentum</div>
+      <div class="callout-body">Your scores reflect a stable, functional team. The 12-month foresee (71%) is the main area to watch — it suggests some underlying uncertainty about the future that's worth exploring directly with the team. Limited open-text data this cycle means the numbers alone should guide the conversation.</div>
+    </div>
+  </div>
+
+  <div class="section stack gap-12">
+    <h2>Team Insights from Open-Text Responses</h2>
+    <div class="grid-2" style="align-items: start;">
+      <div class="card">
+        <div class="card-header">Your Superpower (as seen by your team)</div>
+        <div class="card-body stack gap-8">
+          <p>"<em>Victoria has been great at following up on items I've requested for my accounts.</em>"</p>
+          <p>The team values responsiveness and follow-through as hallmarks of your leadership style.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">What Your Team Is Asking For</div>
+        <div class="card-body stack gap-8">
+          <p>Limited open-text feedback was submitted for this cycle, which makes it harder to identify specific themes beyond the quantitative scores.</p>
+          <p>The 12-month foresee score (71%) and TMI (88%) suggest there are development conversations worth having — the team may not be sharing everything in writing that they'd share in person.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="section stack gap-12">
+    <h2>Org-Wide Context — May 2026</h2>
+    <p style="margin-bottom: 8px;">The following reflects results for the full RCG SE Organization.</p>
+    <div class="grid-3">
+      <div class="card"><div class="card-header">Engagement Index <span class="pill pill-warning">Below Goal</span></div><div class="card-body v2mom-card"><div class="v2mom-row"><div class="stat"><div class="stat-value stat-warning">82%</div><div class="stat-label">Org Score</div></div><div class="stack gap-4"><p>Goal: <strong>83%</strong></p><p class="v2mom-meta">&#8209;5 vs Nov 25</p></div></div></div></div>
+      <div class="card"><div class="card-header">Talent Multiplier Index <span class="pill pill-success">On Track</span></div><div class="card-body v2mom-card"><div class="v2mom-row"><div class="stat"><div class="stat-value stat-success">95%</div><div class="stat-label">Org Score</div></div><div class="stack gap-4"><p>Goal: <strong>90%</strong></p><p class="v2mom-meta">&#8209;5 vs Nov 25</p></div></div></div></div>
+      <div class="card"><div class="card-header">Avoid Bureaucracy <span class="pill pill-danger">Below Goal</span></div><div class="card-body v2mom-card"><div class="v2mom-row"><div class="stat"><div class="stat-value stat-danger">40%</div><div class="stat-label">Org Score</div></div><div class="stack gap-4"><p>Goal: <strong>64%</strong></p><p class="v2mom-meta">&#8209;13 vs Nov 25</p></div></div></div></div>
+      <div class="card"><div class="card-header">Inclusive Leadership <span class="pill pill-success">On Track</span></div><div class="card-body v2mom-card"><div class="v2mom-row"><div class="stat"><div class="stat-value stat-success">98%</div><div class="stat-label">Org Score</div></div><div class="stack gap-4"><p>Goal: <strong>90%</strong></p><p class="v2mom-meta">+8pp above goal</p></div></div></div></div>
+      <div class="card"><div class="card-header">AI Confidence <span class="pill pill-warning">Below Goal</span></div><div class="card-body v2mom-card"><div class="v2mom-row"><div class="stat"><div class="stat-value stat-warning">80%</div><div class="stat-label">Org Score</div></div><div class="stack gap-4"><p>Goal: <strong>85%</strong></p><p class="v2mom-meta">+24 vs May 25</p></div></div></div></div>
+      <div class="card"><div class="card-header">Manager Models AI Use <span class="pill pill-success">On Track</span></div><div class="card-body v2mom-card"><div class="v2mom-row"><div class="stat"><div class="stat-value stat-success">91%</div><div class="stat-label">Org Score</div></div><div class="stack gap-4"><p>Goal: <strong>85%</strong></p><p class="v2mom-meta">+7 vs Nov 25</p></div></div></div></div>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="section stack gap-12">
+    <div class="row gap-8">
+      <h2>Your Top 3 Recommended Actions</h2>
+      <span class="pill pill-info">Personalized</span>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="row gap-8"><span class="rank-badge">1</span> Establish a Structured Goal-Setting Process</span> <span class="pill pill-warning">30 Days</span></div>
+      <div class="card-body stack gap-8">
+        <p>With a 71% 12-month foresee score and limited open-text signal explaining the "why," the highest-leverage starting point is building clear, documented quarterly goals for each SE so they can see their own trajectory. When people can see where they're headed and how they're tracking, uncertainty decreases.</p>
+        <p><strong>Action:</strong> Before the end of Q3, sit down with each SE to co-create written goals covering business outcomes and personal development. Build a monthly check-in on those goals into your 1:1 cadence. This creates a feedback loop and gives you much richer data on what's driving scores by next cycle.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="row gap-8"><span class="rank-badge">2</span> Make Career Conversations a Standing 1:1 Agenda Item</span> <span class="pill pill-warning">30 Days</span></div>
+      <div class="card-body stack gap-8">
+        <p>The 71% 12-month foresee score alongside an 88% TMI suggests some people trust you and value working with you, but aren't certain about their future here. Career conversations — done consistently, not just at performance review time — are the fastest way to surface and address that uncertainty before it becomes a departure decision.</p>
+        <p><strong>Action:</strong> Add "career development" as a standing agenda item in monthly 1:1s. Ask directly: "What does success look like for you in the next 12 months, and how can I help you get there?" Listen more than you advise. Make it a consistent practice, not a one-time check-in.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="row gap-8"><span class="rank-badge">3</span> Run a Direct Team Conversation to Understand the Scores</span> <span class="pill pill-info">Next Team Meeting</span></div>
+      <div class="card-body stack gap-8">
+        <p>Limited open-text feedback means the quantitative scores are telling part of the story but not all of it. A candid, direct team conversation will surface more in 30 minutes than the survey data can on its own — and it signals that you take the results seriously and want to act on them.</p>
+        <p><strong>Action:</strong> In your next team meeting, share the key scores openly and ask two questions: "What would make this a 10 out of 10 place to work for you?" and "What's the one thing I could do differently that would make the biggest difference?" Capture the answers and follow up with what you're doing about them. That follow-through is what builds trust for the next cycle.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+  <div class="footer">GIS May 2026 &middot; Victoria O'Brien — Individual Leader Review &middot; Confidential &middot; Prepared June 2026</div>
+</div>
+</body>
+</html>
